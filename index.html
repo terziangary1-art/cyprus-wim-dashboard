@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyprus WIM Dashboard</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8}
+header{background:#1f2937;color:white;padding:16px 24px}
+.container{padding:16px}
+.stats{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.card{background:white;padding:16px;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.15);min-width:180px}
+#map{height:600px;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+table{width:100%;border-collapse:collapse;background:white;margin-top:16px}
+th,td{padding:10px;border:1px solid #ddd;text-align:left}
+th{background:#eef2f7}
+.search{padding:10px;width:300px;max-width:100%;margin-top:16px}
+</style>
+</head>
+<body>
+
+<header>
+<h1>Cyprus WIM (Weigh-In-Motion) Locations</h1>
+<p>Interactive map of the 13 WIM stations from the DATEX II XML dataset.</p>
+</header>
+
+<div class="container">
+<div class="stats">
+<div class="card"><h2>13</h2><div>Total Sites</div></div>
+<div class="card"><h2>WIM</h2><div>Sensor Type</div></div>
+<div class="card"><h2>High-Speed</h2><div>System Subtype</div></div>
+</div>
+
+<div id="map"></div>
+
+<input class="search" id="search" placeholder="Search site name...">
+
+<table>
+<thead>
+<tr><th>ID</th><th>Name</th><th>Latitude</th><th>Longitude</th></tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+const sites=[
+{id:2111,name:"A1 - Highway Nicosia-Limassol (Latsia-Limassol)",lat:35.103171,lon:33.369540},
+{id:2112,name:"A1 - Highway Limassol-Nicosia (Skarinou-Larnaka)",lat:34.8172865,lon:33.3627572},
+{id:2113,name:"A1 - Highway Nicosia-Limassol (Parekklisia-Lemesos)",lat:34.7179898,lon:33.1775335},
+{id:2114,name:"A6 - Highway Limassol-Pafos (Episkopi-Pafos)",lat:34.6832131,lon:32.9029479},
+{id:2115,name:"A1 - Highway Limassol-Nicosia (Latsia flyover-Nicosia)",lat:35.1041576,lon:33.3687694},
+{id:2116,name:"A6 - Highway Pafos-Limassol (Episkopi-Limassol)",lat:34.681275,lon:32.893736},
+{id:2117,name:"A6 - Mandria Area (Pafos)",lat:34.710347,lon:32.553908},
+{id:2118,name:"B1 - Kofinou Area (Larnaka)",lat:34.835958,lon:33.3987465},
+{id:2119,name:"A2 - Rizoelia Area (Larnaka)",lat:34.9605535,lon:33.5692432},
+{id:2120,name:"A3 - Xylofagou Area (Famagusta)",lat:34.9761308,lon:33.8788232},
+{id:2121,name:"A9 - Anthoupolis Area (Nicosia)",lat:35.1457047,lon:33.2518476},
+{id:2122,name:"A2 - Oroklini Area",lat:34.9709864,lon:33.6517092},
+{id:2123,name:"Neo Limani Street Limassol (Kathetos)",lat:34.649128,lon:33.000158}
+];
+
+const map=L.map('map').setView([34.9,33.2],8);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
+
+sites.forEach(s=>{
+L.marker([s.lat,s.lon]).addTo(map)
+.bindPopup(`<b>${s.name}</b><br>ID: ${s.id}`);
+});
+
+const tbody=document.getElementById('tbody');
+
+function render(filter=''){
+tbody.innerHTML='';
+sites.filter(s=>s.name.toLowerCase().includes(filter.toLowerCase()))
+.forEach(s=>{
+const tr=document.createElement('tr');
+tr.innerHTML=`<td>${s.id}</td><td>${s.name}</td><td>${s.lat}</td><td>${s.lon}</td>`;
+tbody.appendChild(tr);
+});
+}
+
+render();
+
+document.getElementById('search').addEventListener('input',e=>render(e.target.value));
+</script>
+
+</body>
+</html>
